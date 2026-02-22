@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Cyber Security Awareness Calendar 2026</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f9;
+  text-align: center;
+  margin: 0;
+}
+
+.header {
+  background: #550b91;
+  color: white;
+  padding: 15px;
+}
+
+.header img {
+  height: 70px;
+  display: block;
+  margin: 0 auto 10px;
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 20px;
+}
+
+.month {
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.month h2 {
+  margin: 5px 0 10px;
+}
+
+.days, .weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  font-size: 12px;
+}
+
+.weekdays div {
+  font-weight: bold;
+  background: #dfe6f3;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.day {
+  padding: 8px;
+  background: #e9edf5;
+  border-radius: 5px;
+  cursor: pointer;
+  min-height: 25px;
+}
+
+.empty {
+  background: transparent;
+  cursor: default;
+}
+
+.highlight {
+  background: #ffcc00;
+  font-weight: bold;
+}
+
+.popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  width: 340px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.close-btn {
+  margin-top: 10px;
+  padding: 6px 12px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Suggestion Box */
+.suggestion-box {
+  background: white;
+  margin: 30px auto;
+  padding: 20px;
+  width: 60%;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.suggestion-box input,
+.suggestion-box textarea {
+  width: 90%;
+  padding: 8px;
+  margin: 8px 0;
+}
+
+.suggestion-box button {
+  padding: 8px 15px;
+  background: #0b3d91;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.footer {
+  color: rgb(0, 0, 0);
+  text-decoration-style: solid;
+  text-decoration: solid;
+  padding: 10px;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="http://www.youtube.com/@Techdefenders1?sub_confirmation=1"><img src="Tech Defender (The Cyber Security Expert)-1-modified.png" alt="Logo" height="150px" width="120px"></a>
+  <h1>Cyber Security Awareness Calendar 2026</h1>
+</div>
+
+<div class="calendar" id="calendar"></div>
+
+<div class="popup" id="popup">
+  <h3 id="popup-title"></h3>
+  <p id="popup-content"></p>
+  <button class="close-btn" onclick="closePopup()">Close</button>
+</div>
+
+<div class="suggestion-box">
+  <h2>Send Your Suggestions</h2>
+  <form id="suggestionForm">
+    <input type="text" id="name" placeholder="Your Name" required><br>
+    <input type="text" id="mobile" placeholder="Mobile Number" required><br>
+    <input type="email" id="email" placeholder="Gmail ID" required><br>
+    <textarea id="suggestion" rows="4" placeholder="Your Suggestion" required></textarea><br>
+    <label>
+      <input type="checkbox" required>
+    </label><p>I agree to share my details.</p>
+    <br><br>
+    <button type="submit">Submit</button>
+  </form>
+  <p id="formMessage"></p>
+</div>
+
+<div class="footer">
+  Developed by:- TechDefenders(The Cyber Security Experts) | 
+  <a href="http://www.linkedin.com/in/ujjwalkumawat" target="_blank" rel="noopener noreferrer">LinkedIn Profile:- UJJWAL KUMAWAT</a> 
+</div>
+
+<script>
+const currentYear = new Date().getFullYear();
+
+const cyberDaysTemplate = {
+"01-24": "International Day of Education & National Girl Child Day\nFocus: Cyber careers, digital literacy, online safety for girls.",
+"01-28": "Data Privacy Day\nFocus: Personal data protection, privacy awareness.",
+"02-10": "Safer Internet Day (2nd Tuesday Feb)\nFocus: Cyberbullying prevention, responsible social media.",
+"03-15": "World Consumer Rights Day\nFocus: Online shopping fraud, UPI scams.",
+"03-31": "World Backup Day\nFocus: Data backup, ransomware awareness.",
+"04-26": "World Intellectual Property Day\nFocus: Software piracy, copyright awareness.",
+"05-03": "World Press Freedom Day\nFocus: Fake news, misinformation.",
+"05-07": "World Password Day (1st Thursday May)\nFocus: Strong passwords, 2FA.",
+"05-11": "National Technology Day\nFocus: Cyber innovation awareness.",
+"05-17": "World Telecommunication Day\nFocus: Secure communication.",
+"06-30": "World Social Media Day\nFocus: Social media safety.",
+"07-13": "Anti-Phishing Awareness Week (2nd Week July)\nFocus: Email scams, OTP fraud.",
+"08-12": "International Youth Day\nFocus: Youth digital responsibility.",
+"09-08": "International Literacy Day\nFocus: Digital literacy, fake news.",
+"09-28": "Universal Access to Information Day\nFocus: Responsible information sharing.",
+"10-01": "National Cyber Security Awareness Month (Full October)\nFocus: Cyber hygiene campaigns.",
+"11-14": "Children’s Day\nFocus: Online gaming safety.",
+"11-26": "Constitution Day\nFocus: Cyber laws awareness.",
+"11-30": "Computer Security Day\nFocus: Antivirus, system protection.",
+"12-10": "Human Rights Day\nFocus: Right to privacy online."
+};
+
+const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const weekdays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+function generateCalendar() {
+const calendar = document.getElementById("calendar");
+calendar.innerHTML = "";
+
+for (let m = 0; m < 12; m++) {
+
+const monthDiv = document.createElement("div");
+monthDiv.className = "month";
+
+const monthTitle = document.createElement("h2");
+monthTitle.textContent = months[m] + " " + currentYear;
+monthDiv.appendChild(monthTitle);
+
+const weekdaysDiv = document.createElement("div");
+weekdaysDiv.className = "weekdays";
+
+weekdays.forEach(day => {
+const wd = document.createElement("div");
+wd.textContent = day;
+weekdaysDiv.appendChild(wd);
+});
+
+monthDiv.appendChild(weekdaysDiv);
+
+const daysDiv = document.createElement("div");
+daysDiv.className = "days";
+
+const firstDay = new Date(currentYear, m, 1).getDay();
+const daysInMonth = new Date(currentYear, m + 1, 0).getDate();
+
+for (let i = 0; i < firstDay; i++) {
+const emptyDiv = document.createElement("div");
+emptyDiv.className = "day empty";
+daysDiv.appendChild(emptyDiv);
+}
+
+for (let d = 1; d <= daysInMonth; d++) {
+
+const monthNum = String(m + 1).padStart(2, '0');
+const dayNum = String(d).padStart(2, '0');
+const dateKey = monthNum + "-" + dayNum;
+
+const dayDiv = document.createElement("div");
+dayDiv.className = "day";
+dayDiv.textContent = d;
+
+if (cyberDaysTemplate[dateKey]) {
+dayDiv.classList.add("highlight");
+dayDiv.onclick = () => showPopup(d, monthNum, cyberDaysTemplate[dateKey]);
+}
+
+daysDiv.appendChild(dayDiv);
+}
+
+monthDiv.appendChild(daysDiv);
+calendar.appendChild(monthDiv);
+}
+}
+
+function showPopup(day, month, content) {
+const formattedDate = day + "/" + month + "/" + currentYear;
+document.getElementById("popup-title").textContent = formattedDate;
+document.getElementById("popup-content").textContent = content;
+document.getElementById("popup").style.display = "block";
+}
+
+function closePopup() {
+document.getElementById("popup").style.display = "none";
+}
+
+generateCalendar();
+
+document.getElementById("suggestionForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const formData = new FormData();
+  formData.append("name", document.getElementById("name").value);
+  formData.append("mobile", document.getElementById("mobile").value);
+  formData.append("email", document.getElementById("email").value);
+  formData.append("suggestion", document.getElementById("suggestion").value);
+
+  fetch("https://script.google.com/macros/s/AKfycbwGcdtNvpVsf6f5_1QNabZOx0qZW_L7-l3paXxjTk9cx3iNSqhQLcgwRebci8e_UULW9w/exec", {
+    method: "POST",
+    body: formData
+  })
+  .then(response => response.text())
+  .then(result => {
+    document.getElementById("formMessage").innerHTML = "✅ Submitted Successfully!";
+    document.getElementById("suggestionForm").reset();
+  })
+  .catch(error => {
+    document.getElementById("formMessage").innerHTML = "❌ Submission Failed!";
+  });
+});
+
+</script>
+
+</body>
+</html>
